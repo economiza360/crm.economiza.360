@@ -207,10 +207,10 @@
     const msg = document.getElementById('msgLogin');
 
     auth.signInWithEmailAndPassword(email, senha)
-      .then(() => {
+      .then((cred) => {
         msg.classList.add('success');
         msg.textContent = "Login realizado com sucesso!";
-        // Aqui depois vamos redirecionar para a página principal do sistema
+        entrarNoSistema(cred.user);
       })
       .catch((error) => {
         msg.classList.remove('success');

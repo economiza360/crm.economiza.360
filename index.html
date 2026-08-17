@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acesso ao Sistema</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  body {
+    background-color: #0a1f44;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .container {
+    background-color: #ffffff;
+    width: 350px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    overflow: hidden;
+  }
+
+  .header {
+    background-color: #0a1f44;
+    color: #ffffff;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .header h1 {
+    font-size: 22px;
+  }
+ .tabs {
+    display: flex;
+  }
+
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    cursor: pointer;
+    background-color: #e6e9f0;
+    color: #0a1f44;
+    font-weight: bold;
+    border-bottom: 3px solid transparent;
+    transition: 0.3s;
+  }
+
+  .tab.active {
+    background-color: #ffffff;
+    border-bottom: 3px solid #0a1f44;
+  }
+
+  .form-box {
+    padding: 25px;
+  }
+
+  .form-box.hidden {
+    display: none;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 6px;
+    color: #0a1f44;
+    font-weight: bold;
+    font-size: 14px;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    background-color: #0a1f44;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background-color: #14305e;
+  }
+
+  .msg {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 13px;
+    color: red;
+  }
+
+  .msg.success {
+    color: green;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>Bem-vindo</h1>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" id="tabLogin" onclick="mostrarLogin()">Login</div>
+    <div class="tab" id="tabCadastro" onclick="mostrarCadastro()">Cadastro</div>
+  </div>
+ <div class="form-box" id="formLogin">
+    <label>Email</label>
+    <input type="email" id="loginEmail" placeholder="Digite seu email">
+
+    <label>Senha</label>
+    <input type="password" id="loginSenha" placeholder="Digite sua senha">
+
+    <button onclick="fazerLogin()">Entrar</button>
+
+    <div class="msg" id="msgLogin"></div>
+  </div>
+  <div class="form-box hidden" id="formCadastro">
+    <label>Email</label>
+    <input type="email" id="cadastroEmail" placeholder="Digite seu email">
+
+    <label>Senha</label>
+    <input type="password" id="cadastroSenha" placeholder="Crie uma senha">
+
+    <button onclick="fazerCadastro()">Cadastrar</button>
+
+    <div class="msg" id="msgCadastro"></div>
+  </div>
+
+</div>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+  // Configuração do Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyC1oZ9sky9XLaLbkztPuugEYY1bB1kTlyg",
+    authDomain: "crm-ez360.firebaseapp.com",
+    projectId: "crm-ez360",
+    storageBucket: "crm-ez360.firebasestorage.app",
+    messagingSenderId: "271199893828",
+    appId: "1:271199893828:web:5d3f4f2b0b0903820fff11"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  // Trocar entre abas
+  function mostrarLogin() {
+    document.getElementById('formLogin').classList.remove('hidden');
+    document.getElementById('formCadastro').classList.add('hidden');
+    document.getElementById('tabLogin').classList.add('active');
+    document.getElementById('tabCadastro').classList.remove('active');
+  }
+
+  function mostrarCadastro() {
+    document.getElementById('formCadastro').classList.remove('hidden');
+    document.getElementById('formLogin').classList.add('hidden');
+    document.getElementById('tabCadastro').classList.add('active');
+    document.getElementById('tabLogin').classList.remove('active');
+  }
+
+  // Cadastro
+  function fazerCadastro() {
+    const email = document.getElementById('cadastroEmail').value;
+    const senha = document.getElementById('cadastroSenha').value;
+    const msg = document.getElementById('msgCadastro');
+
+    auth.createUserWithEmailAndPassword(email, senha)
+      .then(() => {
+        msg.textContent = "Cadastro realizado com sucesso!";
+        msg.classList.add('success');
+        setTimeout(() => mostrarLogin(), 1500);
+      })
+      .catch((error) => {
+        msg.classList.remove('success');
+        msg.textContent = "Erro: " + error.message;
+      });
+  }
+
+  // Login
+  function fazerLogin() {
+    const email = document.getElementById('loginEmail').value;
+    const senha = document.getElementById('loginSenha').value;
+    const msg = document.getElementById('msgLogin');
+
+    auth.signInWithEmailAndPassword(email, senha)
+      .then(() => {
+        msg.classList.add('success');
+        msg.textContent = "Login realizado com sucesso!";
+        // Aqui depois vamos redirecionar para a página principal do sistema
+      })
+      .catch((error) => {
+        msg.classList.remove('success');
+        msg.textContent = "Erro: " + error.message;
+      });
+  }
+</script>
+
+</body>
+</html>
